@@ -9,6 +9,7 @@ RUN apt-get update \
        python3 \
        ca-certificates \
        nginx \
+       git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g pnpm@11.7.0
@@ -16,6 +17,12 @@ RUN npm install -g pnpm@11.7.0
 COPY . .
 
 RUN pnpm install --no-frozen-lockfile
+
+RUN git init \
+    && git config user.email "build@localhost" \
+    && git config user.name "Docker Build" \
+    && git add -A \
+    && git commit -m "Docker build"
 
 RUN pnpm run build
 
