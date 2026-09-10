@@ -24,12 +24,11 @@ RUN git init \
     && git add -A \
     && git commit -m "Docker build"
 
-# BẮT BUỘC PHẢI BUILD TRƯỚC ĐỂ SINH RA CÁC FILE CLI/LIB TRONG MONOREPO
+# Build toàn bộ monorepo trước để sinh ra các file thực thi CLI/lib
 RUN pnpm build
 
 RUN rm -f /etc/nginx/sites-enabled/default
 
-# Cấu hình Nginx lắng nghe cổng 8080 (hoặc cổng $PORT của Dockhosting) và trỏ về app chạy ở cổng nội bộ 3080
 RUN printf '%s\n' \
 'server {' \
 '    listen 8080;' \
@@ -49,16 +48,14 @@ RUN printf '%s\n' \
 '        proxy_set_header Connection "upgrade";' \
 '        proxy_read_timeout 3600s;' \
 '        proxy_send_timeout 3600s;' \
-'    end' \
+'    }' \
 '}' \
 > /etc/nginx/sites-enabled/deepseek-harness
 
-# Sửa lại start.sh để lắng nghe chính xác trên cổng nội bộ 3080 và bắt buộc bind ra 0.0.0.0 nếu CLI hỗ trợ
 RUN printf '%s\n' \
 '#!/bin/sh' \
 'set -e' \
 '' \
-'# Khởi chạy ứng dụng ở cổng 3080 để khớp với proxy_pass của Nginx' \
 'pnpm dsh web --port 3080 > /tmp/dsh.log 2>&1 &' \
 'DSH_PID=$!' \
 '' \
