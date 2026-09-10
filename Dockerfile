@@ -24,7 +24,6 @@ RUN git init \
     && git add -A \
     && git commit -m "Docker build"
 
-# Build toàn bộ monorepo trước để sinh ra các file thực thi CLI/lib
 RUN pnpm build
 
 RUN rm -f /etc/nginx/sites-enabled/default
@@ -56,7 +55,7 @@ RUN printf '%s\n' \
 '#!/bin/sh' \
 'set -e' \
 '' \
-'pnpm dsh web --port 3080 > /tmp/dsh.log 2>&1 &' \
+'HOST=0.0.0.0 pnpm dsh web --port 3080 > /tmp/dsh.log 2>&1 &' \
 'DSH_PID=$!' \
 '' \
 'sleep 5' \
